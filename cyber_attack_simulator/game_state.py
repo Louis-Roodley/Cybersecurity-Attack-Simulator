@@ -15,17 +15,24 @@ class GameState:
 
     def add_experience(self, xp: int):
         """Ajoute de l'expérience au joueur"""
-        pass
+        self.experience += xp
+        # Logique de montée de niveau simple
+        if self.experience >= self.level * 100:
+            self.level += 1
+            print(f"🎉 Niveau supérieur! Vous êtes maintenant niveau {self.level}")
 
     def unlock_command(self, command: str):
         """Débloque une nouvelle commande"""
-        pass
+        if command not in self.unlocked_commands:
+            self.unlocked_commands.add(command)
+            print(f"🔓 Nouvelle commande débloquée: {command}")
 
-    def update_state(self, data: dict):
+    def update_state(self, new_state: dict):
         """Met à jour l'état du jeu de manière contrôlée."""
-        for key, value in data.items():
+        for key, value in new_state.items():
             if hasattr(self, key):
+                # Pour l'instant, nous mettons directement à jour.
+                # On pourrait ajouter de la logique de validation ici.
                 setattr(self, key, value)
             else:
-                # Empêche l'ajout d'attributs non définis
-                print(f"⚠️ Avertissement: Tentative de mise à jour d'un attribut d'état inconnu: {key}")
+                print(f"⚠️ Tentative de mise à jour d'un attribut d'état inconnu: {key}")

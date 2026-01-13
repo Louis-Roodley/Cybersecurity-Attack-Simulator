@@ -2,7 +2,7 @@
 import json
 import importlib
 import os
-from cyber_attack_simulator.game_engine import CyberAttackEngine
+from .game_engine import CyberAttackEngine
 
 def to_camel_case(snake_str: str) -> str:
     """Convertit une chaîne snake_case en CamelCase."""
@@ -16,7 +16,9 @@ class CommandHandlerFactory:
 
     def initialize_all_handlers(self):
         """Charge dynamiquement tous les handlers à partir de data/commands.json."""
-        commands_file = os.path.join(os.path.dirname(__file__), 'data', 'commands.json')
+        # Correction du chemin pour qu'il soit relatif à l'emplacement du fichier
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        commands_file = os.path.join(current_dir, 'data', 'commands.json')
 
         try:
             with open(commands_file, 'r', encoding='utf-8') as f:
@@ -39,19 +41,17 @@ class CommandHandlerFactory:
                 continue
 
             try:
-                module_path = f"handlers.{category}.{handler_template}"
+                # Chemin relatif du module de handler
+                module_path = f".handlers.{category}.{handler_template}"
                 class_name = f"{to_camel_case(command_name)}Handler"
 
-                # Importation dynamique du module
-                handler_module = importlib.import_module(module_path)
+                # Importation dynamique relative au package courant
+                handler_module = importlib.import_module(module_path, package='cyber_attack_simulator')
 
-                # Obtention de la classe depuis le module
                 HandlerClass = getattr(handler_module, class_name)
 
-                # Instanciation et initialisation
                 handler_instance = HandlerClass(self.engine)
                 if handler_instance.initialize():
-                    # La factory est responsable de l'enregistrement du handler ET de ses métadonnées
                     handler_method = getattr(handler_instance, f"handle_{command_name}")
                     self.engine.register_handler(command_name, handler_method)
 

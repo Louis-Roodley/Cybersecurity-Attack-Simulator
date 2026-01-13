@@ -1,5 +1,5 @@
 # game_engine.py
-from cyber_attack_simulator.game_state import GameState
+from .game_state import GameState
 
 class CyberAttackEngine:
     """Moteur principal du simulateur de cyber attaque"""
@@ -29,13 +29,13 @@ class CyberAttackEngine:
 
         self.command_history.append({"command": command, "params": params})
 
-        # Le handler lui-même est la fonction à appeler, enregistrée via `register_handler`
+        # Le handler lui-même est la fonction à appeler
         try:
             result = handler(params)
         except Exception as e:
             return {"success": False, "output": f"❌ Erreur critique lors de l'exécution de '{command}': {e}"}
 
-        # Mise à jour de l'état du jeu avec les résultats
+        # Mise à jour de l'état du jeu
         if result.get("success"):
             if "new_state" in result and isinstance(result["new_state"], dict):
                 self.game_state.update_state(result["new_state"])
@@ -44,16 +44,14 @@ class CyberAttackEngine:
                 for flag in result["flags"]:
                     self.add_flag(flag)
 
-            # Mise à jour du niveau de détection (placeholder)
-            # risk = RiskCalculator.calculate_detection_risk(command, params)
-            # self.update_detection(risk)
-
         return result
 
     def update_detection(self, risk: float):
         """Met à jour le niveau de détection"""
-        pass
+        self.detection_level += risk * self.game_state.stealth_level
 
     def add_flag(self, flag: str):
         """Ajoute un flag au joueur"""
-        self.flags.add(flag)
+        if flag not in self.flags:
+            self.flags.add(flag)
+            print(f"🚩 Nouveau flag obtenu: {flag}")
