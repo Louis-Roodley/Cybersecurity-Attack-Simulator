@@ -16,9 +16,10 @@ class CommandHandlerFactory:
 
     def initialize_all_handlers(self):
         """Charge dynamiquement tous les handlers à partir de data/commands.json."""
-        # Correction du chemin pour qu'il soit relatif à l'emplacement du fichier
+        # Chemin dynamique pour atteindre 'data/commands.json' depuis la racine du projet
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        commands_file = os.path.join(current_dir, 'data', 'commands.json')
+        project_root = os.path.dirname(current_dir)
+        commands_file = os.path.join(project_root, 'data', 'commands.json')
 
         try:
             with open(commands_file, 'r', encoding='utf-8') as f:
